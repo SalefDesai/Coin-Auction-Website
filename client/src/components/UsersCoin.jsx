@@ -2,8 +2,11 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { getUsersCoin } from '../utils/Routes';
 import Modal from './Modal';
+import { useNavigate } from 'react-router-dom';
 
 const UsersCoin = ({user}) => {
+
+  const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);  
 
@@ -11,9 +14,13 @@ const UsersCoin = ({user}) => {
     const fetchData = async() => {
       try {
         setLoading(true); // Set loading to true while fetching
-        const response = await axios.post(`${getUsersCoin}`, { userId: user.userId });
+        const response = await axios.get(`${getUsersCoin}`,{withCredentials:true});
+        if (!response.data.success){
+          navigate("/login");
+        } 
+        // console.log(response);
         setOrders(response.data.data);
-        console.log(response.data.data);
+        // console.log(response.data.data);
       } catch (error) {
         console.error('Error fetching orders:', error);
       } finally {

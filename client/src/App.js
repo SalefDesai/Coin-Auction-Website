@@ -17,6 +17,7 @@ import AuctionResult from './pages/AuctionResult.jsx';
 import DeliveryDetails from './pages/DeliveryDetails.jsx';
 import PaymentSuccess from './pages/PaymentSuccess.jsx';
 import UsersProfile from './pages/UsersProfile.jsx';
+import SellersPage from './pages/SellersPage.jsx';
 
 
 function App() {
@@ -44,6 +45,7 @@ function App() {
         
         <Route path='/admindashboard' element={<AdminDashboard/>} />
         <Route path='/userprofile' element={<UsersProfile />} />
+        <Route path='/sellerspage' element={<SellersPage />} />
 
 
       </Routes>

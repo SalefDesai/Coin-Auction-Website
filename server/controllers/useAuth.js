@@ -161,7 +161,7 @@ export const checkAuth = async(req,res) => {
 
 export const getUsersCoin = async(req,res) => {
     try {
-        const {userId} = req.body;
+        const userId = req.user;
 
         const orders = await Order.find({userId,isPaymentDone:true});
 
@@ -208,7 +208,7 @@ export const getRemainingPayment = async(req,res) => {
 }
 
 
-export const UpdateUserProfile = async(req,res) => {
+export const updateUserProfile = async(req,res) => {
     try {
         const {userId, name, userProfileImage, gender, phone } = req.body;
         const user = await User.findByIdAndUpdate(userId, {name,userProfileImage,gender,phone},{new:true})
@@ -233,5 +233,31 @@ export const UpdateUserProfile = async(req,res) => {
             success: false,
             message: 'Internal Server Error',
         });
+    }
+}
+
+export const makeOffer = async(req,res) => {
+    try {
+        const userId = req.user;
+        const {
+            name,
+            description,
+            material,
+            image,
+            offer
+        } = req.body;
+
+        const data = new Coin({
+            name,
+            description,
+            material,
+            image,
+            offer,
+            isAcceptedByAdmin:false
+        })
+        
+
+    } catch (error) {
+        
     }
 }

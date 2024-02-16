@@ -27,20 +27,28 @@ const AdminDashboard = () => {
             <div className={`nav-link ${currentContent === 'new coin' ? 'active':'link-body-emphasis'}`}
               onClick={() => handleButtonClick('new coin')} >
               <svg className="bi pe-none me-2" width="16" height="16"><use xlinkHref="#table"></use></svg>
-              Add new coins
+              Add New Coin
             </div>
           </li>
           <li className="nav-item">
             <div className={`nav-link ${currentContent === 'coin offer' ? 'active':'link-body-emphasis'}`} 
               onClick={() => handleButtonClick('coin offer')}>
               <svg className="bi pe-none me-2" width="16" height="16"></svg>
-              new coin offers
+              Coin offers
             </div>
           </li>
-          <li>
-            <div className="nav-link link-body-emphasis">
-              <svg className="bi pe-none me-2" width="16" height="16"><use xlinkHref="#grid"></use></svg>
-              Products
+          <li className="nav-item">
+            <div className={`nav-link ${currentContent === 'coin offer' ? 'active':'link-body-emphasis'}`} 
+              onClick={() => handleButtonClick('Accepted/Rejected coin')}>
+              <svg className="bi pe-none me-2" width="16" height="16"></svg>
+              Accepted/Rejected Coin
+            </div>
+          </li>
+          <li className="nav-item">
+            <div className={`nav-link ${currentContent === 'closed auctions' ? 'active':'link-body-emphasis'}`} 
+              onClick={() => handleButtonClick('Accepted/Rejected coin')}>
+              <svg className="bi pe-none me-2" width="16" height="16"></svg>
+              Closed Auctions
             </div>
           </li>
         </ul>
@@ -62,6 +70,8 @@ const AdminDashboard = () => {
       <WraperComponent>
         {currentContent === 'new coin' && <AddNewCoin /> }
         {currentContent === 'coin offer' && <h1>coin offer</h1> }
+        {currentContent === 'Accepted/Rejected coin' && <h1>coin offer</h1> }
+        {currentContent === 'closed auctions' && <h1>coin offer</h1> }
         
       </WraperComponent>
 
@@ -73,7 +83,7 @@ const AdminDashboard = () => {
 
 const Wrapper = styled.div`
   display: flex;
-  height: 100vh;
+  height: 98vh;
   background-color: #f0f0f0;
 `;
 

@@ -10,7 +10,7 @@ const CheckAndShow = ({children}) => {
     useEffect(() => {
 
         if (locaton.pathname ==="/login" || locaton.pathname === "/register" || locaton.pathname === '/userprofile' || 
-        locaton.pathname === '/admindashboard' || locaton.pathname === '/sellcoins' || locaton.pathname === '/auctionresults' || 
+        locaton.pathname === '/admindashboard' || locaton.pathname === '/sellerspage' || locaton.pathname === '/auctionresults' || 
         locaton.pathname.startsWith("/auction/") ) {
             setShow(false);
         } else setShow(true);

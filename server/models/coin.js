@@ -26,6 +26,13 @@ const coinSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  seller :{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'users'
+  },
+  offer : {
+    type: Number,
+  },
   isAcceptedByAdmin: {
     type: Boolean,
     default: false,

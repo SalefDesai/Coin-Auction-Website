@@ -1,28 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
-import UsersCoin from '../components/UsersCoin';
+import { Link, useNavigate } from 'react-router-dom';
 import RemainingPayments from '../components/RemainingPayments';
 import UpdateUserProfile from '../components/UpdateUserProfile';
+import SellCoins from '../components/SellCoins';
 
-const UsersProfile = () => {
+const SellersPage = () => {
 
   const navigate = useNavigate();
-  const [currentContent, setCurrentContent] = useState('your coins');
+  const [currentContent, setCurrentContent] = useState('sell coins');
   const [user,setUser] = useState();
 
   useEffect(() => {
     const setUserFromLocalStorage = async () => {
-      const data = await JSON.parse(localStorage.getItem('coin-auction'));
-      if(!data) navigate("/login");
-
-      setUser(data);
+      setUser(await JSON.parse(localStorage.getItem('coin-auction')));
     };
 
     setUserFromLocalStorage();
   }, []);
-
-  // useEffect(() => {console.log("user :" ,user)},[user])
 
   const handleButtonClick = (content) => {
     setCurrentContent(content);
@@ -33,17 +28,17 @@ const UsersProfile = () => {
     <Wrapper>
         <Sidebar>
       <div className="d-flex flex-column flex-shrink-0 p-3 bg-body-tertiary" style={{height:'96%'}}>
-        <a href="/" className="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
+        <Link  to={"/sellerspage"} className="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
           <svg className="bi pe-none me-2" width="40" height="32"><use xlinkHref="#bootstrap"></use></svg>
-          <span className="fs-4">User Profile</span>
-        </a>
+          <span className="fs-4">Seller's Page</span>
+        </Link>
         <hr />
-        <ul className="nav nav-pills flex-column mb-auto">
+        <ul className="nav nav-pills flex-column mb-auto" style={{cursor:'pointer'}}>
         <li >
-            <div className={`nav-link ${currentContent === 'your coins' ? 'active':'link-body-emphasis'}`}
-              onClick={() => handleButtonClick('your coins')} >
+            <div className={`nav-link ${currentContent === 'sell coins' ? 'active':'link-body-emphasis'}`}
+              onClick={() => handleButtonClick('sell coins')} >
               <svg className="bi pe-none me-2" width="16" height="16"><use xlinkHref="#table"></use></svg>
-              Your Coins
+              Sell Coins
             </div>
           </li>
           <li className="nav-item">
@@ -77,7 +72,7 @@ const UsersProfile = () => {
       </Sidebar>
 
       <WraperComponent>
-        {currentContent === 'your coins' && <UsersCoin user={user} /> }
+        {currentContent === 'sell coins' && <SellCoins /> }
         {currentContent === 'remaining payment' && <RemainingPayments user={user} /> } 
         {currentContent === 'edit profile' && <UpdateUserProfile user={user} /> }
         
@@ -113,4 +108,4 @@ const Sidebar = styled.div`
   margin : 10px;
 `;
 
-export default UsersProfile;
+export default SellersPage;

@@ -46,13 +46,6 @@ export const instance = new Razorpay({
 });
 
 
-
-app.get("/",(req,res) => {
-  console.log(".................in Here>..................");
-  res.cookie("cookie","cookie-set");
-  res.send("hello");
-})
-
 app.use("/userauth",user);
 app.use("/coin",coins);
 app.use("/api/payment",payment)

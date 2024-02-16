@@ -4,15 +4,13 @@ import { showErrorToast, showSuccessToast } from '../utils/Toast';
 import axios from 'axios';
 import { addNewCoin } from '../utils/Routes';
 
-const AddNewCoin = () => {
+const SellCoins = () => {
   const [coinData, setCoinData] = useState({
     name: '',
     description: '',
     material: '',
     image: '',
-    auctionStartDateAndTime: '',
-    auctionDuration: '',
-    initialPrice: '',
+    offer: ''
   });
   const[loading,setLoading] = useState(false);
 
@@ -23,6 +21,7 @@ const AddNewCoin = () => {
       [name]: value,
     }));
   };
+
   const convertToBase64 = (event) => {
     const {name} = event.target;
     const file = event.target.files[0];
@@ -45,38 +44,37 @@ const AddNewCoin = () => {
 
   const handleSubmit = async(e) => {
     e.preventDefault();
-    const currentDate = new Date();
-    const enteredDateTime = new Date(coinData.auctionStartDateAndTime);
+    console.log(coinData);
+    // const currentDate = new Date();
+    // const enteredDateTime = new Date(coinData.auctionStartDateAndTime);
 
-    if (enteredDateTime < currentDate) {
-        showErrorToast("Please select a future date and time.")
-        return;
-    }
+    // if (enteredDateTime < currentDate) {
+    //     showErrorToast("Please select a future date and time.")
+    //     return;
+    // }
     
-    try {
-      setLoading(true);
+    // try {
+    //   setLoading(true);
 
-        const response = await axios.post(`${addNewCoin}`,{...coinData},{withCredentials:true});
+    //     const response = await axios.post(`${addNewCoin}`,{...coinData},{withCredentials:true});
 
-        if (response.data.success) {
-          showSuccessToast("coin added successfully")
-        } else {
-            showErrorToast("Unable to add coin.");
-        }
-    } catch (error) {
-        console.log("errro : ", error);
-    } finally {
-      setLoading(false);
-    }
+    //     if (response.data.success) {
+    //       showSuccessToast("coin added successfully")
+    //     } else {
+    //         showErrorToast("Unable to add coin.");
+    //     }
+    // } catch (error) {
+    //     console.log("errro : ", error);
+    // } finally {
+    //   setLoading(false);
+    // }
 
     setCoinData({
         name: '',
         description: '',
         material: '',
         image: '',
-        auctionStartDateAndTime: '',
-        auctionDuration: '',
-        initialPrice: '',
+        offer: '',
     });
 
     // Reset the file input value to clear the selected file
@@ -105,19 +103,11 @@ const AddNewCoin = () => {
           <FormInput type='file' name="image" id="imageInput" accept='image/*' onChange={convertToBase64} />
         </FormLabel>
         <FormLabel>
-          Auction Start Date and Time:
-          <FormInput type="datetime-local" name="auctionStartDateAndTime" value={coinData.auctionStartDateAndTime} onChange={handleChange} />
-        </FormLabel>
-        <FormLabel>
-          Auction Duration:
-          <FormInput type="time" name="auctionDuration" value={coinData.auctionDuration} onChange={handleChange} />
-        </FormLabel>
-        <FormLabel>
-          Initial Price in Rs.:
-          <FormInput type="number" name="initialPrice" value={coinData.initialPrice} onChange={handleChange} />
+          Your Offer:
+          <FormInput type="number" name="offer" value={coinData.offer} onChange={handleChange} />
         </FormLabel>
         <FormButton type="submit" disabled={loading}>
-          {loading ? 'Submitting...' : 'Submit'}
+          {loading ? 'Submitting...' : 'Make An Offer'}
         </FormButton>
       </form>
     </FormContainer>
@@ -164,4 +154,4 @@ const FormButton = styled.button`
   width : 100%
 `;
 
-export default AddNewCoin;
+export default SellCoins;

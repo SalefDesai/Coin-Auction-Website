@@ -11,7 +11,9 @@ const Header = () => {
 
     const navigate = useNavigate();
     const [isLogin,setIsLogin] = useState(false);
-    const [user,setUser] = useState({});    
+    const [user,setUser] = useState(null);    
+    const [showSellerPage, setShowSellerPage] = useState(false);
+    const [showAdminPage, setShowAdminPage] = useState(false);
 
     useEffect(() => {
       const getUserInfo = async () => {
@@ -21,10 +23,20 @@ const Header = () => {
           if (response.data.success) {
             setUser(response.data.user);
             setIsLogin(true);
+
+            if (response.data.user.email === 'admin@gmail.com' && response.data.user.userType === 'admin'){
+              setShowAdminPage(true);
+            }
+            if (response.data.user.userType === 'seller'){
+              setShowSellerPage(true);
+            }
+            
           } else {
             setIsLogin(false);
             localStorage.removeItem("coin-auction");
             setUser({});
+            setShowAdminPage(false);
+            setShowSellerPage(false);
           }
         } catch (error) {
           console.log("error : ", error);
@@ -43,6 +55,8 @@ const Header = () => {
         setUser({});
         setIsLogin(false);
         localStorage.removeItem("coin-auction");
+        setShowAdminPage(false);
+        setShowSellerPage(false);
       } else {
         showErrorToast("unable to logout. logout again..!!");
       }
@@ -63,8 +77,8 @@ const Header = () => {
           <ul className="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
             <li><div className="nav-link px-2 link-body-emphasis" style={{ cursor: 'pointer' }} onClick={() => {navigate('/')}} >Home</div></li>
             <li><div className="nav-link px-2 link-body-emphasis" style={{ cursor: 'pointer' }} onClick={() => {navigate('/coins')}} >Coins</div></li>
-            <li><div className="nav-link px-2 link-body-emphasis" style={{ cursor: 'pointer' }} onClick={() => {navigate('/sellcoins')}} >Sell Coins</div></li>
-            <li><div className="nav-link px-2 link-body-emphasis" style={{ cursor: 'pointer' }} onClick={() => {navigate('/admindashboard')}} >Admin Dashboard</div></li>
+            { showSellerPage && <li><div className="nav-link px-2 link-body-emphasis" style={{ cursor: 'pointer' }} onClick={() => {navigate('/sellerspage')}} >Seller's Page</div></li> }
+            { showAdminPage && <li><div className="nav-link px-2 link-body-emphasis" style={{ cursor: 'pointer' }} onClick={() => {navigate('/admindashboard')}} >Admin Dashboard</div></li> }
             <li><div className="nav-link px-2 link-body-emphasis" style={{ cursor: 'pointer' }} onClick={() => {navigate('/contactus')}} >Contact Us</div></li>
             <li><div className="nav-link px-2 link-body-emphasis" style={{ cursor: 'pointer' }} onClick={() => {navigate('/aboutus')}} >About Us</div></li>
           </ul>
@@ -73,19 +87,19 @@ const Header = () => {
             <input type="search" className="form-control" placeholder="Search..." aria-label="Search"/>
           </form>
 
-          <div className="dropdown text-end">
-            <a className="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-              {isLogin ? (
+          <div className="dropdown text-end" style={{ cursor: 'pointer' }}>
+            <div className="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+              {isLogin && user.userProfileImage !== "" ? (
                 <img src={user.userProfileImage} alt="mdo" width="32" height="32" className="rounded-circle"/>
               ) : (
                 <img src="https://th.bing.com/th/id/OIP.ruat7whad9-kcI8_1KH_tQHaGI?w=263&h=218&c=7&r=0&o=5&dpr=1.3&pid=1.7" alt="mdo" width="32" height="32" className="rounded-circle"/>
               )}
               
-            </a>
+            </div>
             <ul className="dropdown-menu text-small" style={{}}>
               { isLogin ? (
                 <>
-                  <li onClick={() => navigate('/userprofile')}><a className="dropdown-item">{user.name}</a></li>
+                  { !showAdminPage && <li><Link className="dropdown-item" to={"/userprofile"}>{user.name}</Link></li> }
                   <li><Link className="dropdown-item" onClick={handleClick}>Sign Out</Link></li>
                 </>
               ) : (

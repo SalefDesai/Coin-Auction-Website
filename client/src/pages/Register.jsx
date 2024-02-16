@@ -218,7 +218,7 @@ const RegistrationPage = () => {
         <Label htmlFor="userType">User Type:</Label>
         <Select id="userType" name="userType" value={formData.userType} onChange={handleChange}>
           <option value="user">User</option>
-          <option value="Seller">Seller</option>
+          <option value="seller">Seller</option>
         </Select>
 
         <Button type="submit">Register</Button>
