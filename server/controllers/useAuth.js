@@ -3,6 +3,8 @@ import bcrypt from 'bcrypt';
 import { sendCookie } from "../utils/features.js";
 import Order from "../models/order.js";
 import Coin from "../models/coin.js";
+import { sendMail } from "../utils/sendMail.js";
+import nodemailer from 'nodemailer';
 
 
 export const signup = async (req,res) => {
@@ -236,6 +238,7 @@ export const updateUserProfile = async(req,res) => {
     }
 }
 
+
 export const makeOffer = async(req,res) => {
     try {
         const userId = req.user;
@@ -260,4 +263,123 @@ export const makeOffer = async(req,res) => {
     } catch (error) {
         
     }
+}
+
+
+export const participateInAuction = async(req,res) => {
+
+    try {    
+    const {userName, userEmail, userId, coinId} = req.body;
+
+    const coinData = await Coin.findById(coinId);
+
+    if(coinData.participants.includes(userId)) {
+        return res.json({
+            success : true,
+            message : "You have already participated in this auction."
+        })
+    }
+
+    const text = `Dear ${userName},
+
+    We are thrilled to confirm your participation in the upcoming auction for the following coin:
+    
+    Coin Name: ${coinData.name}
+    Description: ${coinData.description}
+    Start Time: ${coinData.auctionStartDateAndTime}
+    Duration: ${coinData.auctionDuration}
+    Material: ${coinData.material}
+    Starting Bid: ${coinData.initialPrice}
+    We hope you enjoy participating in the auction and wish you the best of luck! If you have any questions or need assistance, please do not hesitate to contact us.
+    
+    Best regards,
+    Coin Auction Website Team`;
+
+    const html = `<!DOCTYPE html>
+    <html>
+    <head>
+        <title>Confirmation of Your Participation</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 0;
+                padding: 0;
+                background-color: #f4f4f4;
+            }
+    
+            .container {
+                max-width: 600px;
+                margin: 0 auto;
+                padding: 20px;
+                background-color: #ffffff;
+                border-radius: 5px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+    
+            h1 {
+                color: #333333;
+            }
+    
+            p {
+                color: #555555;
+                margin-bottom: 10px;
+            }
+    
+            ul {
+                list-style-type: none;
+                padding: 0;
+            }
+    
+            li {
+                margin-bottom: 5px;
+            }
+    
+            .footer {
+                margin-top: 20px;
+                text-align: center;
+                color: #999999;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Confirmation of Your Participation</h1>
+            <p>Dear ${userName},</p>
+            <p>We are thrilled to confirm your participation in the upcoming auction for the following coin:</p>
+            <ul>
+                <li><strong>Name:</strong> ${coinData.name}</li>
+                <li><strong>Description:</strong> ${coinData.description}</li>
+                <li><strong>Start Time:</strong> ${coinData.auctionStartDateAndTime}</li>
+                <li><strong>Duration:</strong> ${coinData.auctionDuration}</li>
+                <li><strong>Material:</strong> ${coinData.material}</li>
+                <li><strong>Starting Bid:</strong> ${coinData.initialPrice}</li>
+            </ul>
+            <p>We hope you enjoy participating in the auction and wish you the best of luck! Should you have any questions or need assistance, please do not hesitate to contact us.</p>
+            <p class="footer">Best regards,<br/>Coin Auction Website Team</p>
+        </div>
+    </body>
+    </html>
+    `;
+
+    sendMail(userEmail,'Confirmation of Your Participation in the Coin Auction',text,html);
+
+    const updatedCoin = await Coin.findByIdAndUpdate({_id:coinId}, {$push : {participants:userId}}, {new : true})
+
+    if (!updatedCoin) {
+        return res.status(404).json({ message: 'Coin not found' });
+    }
+
+    return res.status(200).json({
+        success : true,
+        message: "Thanks for participating in the auction, we will notify you 1 hour before the auction starts."
+    })
+    } catch (error) {
+        console.log("error in adding participants : ", error);
+        return res.status(500).json({
+            success: false,
+            error: "Internal Server Error",
+            message: "An error occurred during user participation in auction. Please try again later."
+        });
+    }
+
 }

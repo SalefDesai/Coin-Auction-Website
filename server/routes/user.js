@@ -1,5 +1,5 @@
 import express from 'express';
-import { checkAuth, getProfile, getRemainingPayment, getUsersCoin, makeOffer, signIn, signup, updateUserProfile } from '../controllers/useAuth.js';
+import { checkAuth, getProfile, getRemainingPayment, getUsersCoin, makeOffer, participateInAuction, signIn, signup, updateUserProfile } from '../controllers/useAuth.js';
 import { isAuthenitcated } from '../middlewares/auth.js';
 import { logout } from '../utils/features.js';
 
@@ -20,11 +20,13 @@ router.get("/logout",logout);
 
 router.get("/getuserscoin",isAuthenitcated,getUsersCoin);
 
-router.post("/remainingpayment",getRemainingPayment);
+router.post("/remainingpayment",isAuthenitcated,getRemainingPayment);
 
-router.post("/updateuserprofile",updateUserProfile);
+router.post("/updateuserprofile",isAuthenitcated,updateUserProfile);
 
 router.post("/makeOffer",isAuthenitcated,makeOffer)
+
+router.post("/participateinauction",isAuthenitcated,participateInAuction)
 
 
 

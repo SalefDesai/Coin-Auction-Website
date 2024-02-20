@@ -7,6 +7,7 @@ export const getUserProfile = `${host}/userauth/getProfile`;
 export const logout = `${host}/userauth/logout`;
 export const checkIsAuthenticated = `${host}/userauth/checkisauth`;
 export const getUsersCoin = `${host}/userauth/getuserscoin`;
+export const auctionParticipation = `${host}/userauth/participateinauction`;
 export const getRemainingPayment = `${host}/userauth/remainingpayment`;
 export const updateUserProfile = `${host}/userauth/updateuserprofile`;
 export const addNewCoin = `${host}/coin/addnewcoin`;

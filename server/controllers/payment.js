@@ -1,6 +1,9 @@
 import Razorpay from "razorpay";
 import Order from "../models/order.js";
 import crypto from 'crypto';
+import User from "../models/user.js";
+import { sendMail } from "../utils/sendMail.js";
+import Coin from "../models/coin.js";
 
 export const checkout = async(req,res) => {
     try {
@@ -78,7 +81,7 @@ export const checkout = async(req,res) => {
 // }
 
 export const paymentVerification = async(req,res) => {
-    console.log(req.body);
+    // console.log(req.body);
 
     const {razorpay_payment_id,razorpay_order_id,razorpay_signature} = req.body;
     // console.log(razorpay_payment_id,razorpay_order_id,razorpay_signature);
@@ -93,8 +96,94 @@ export const paymentVerification = async(req,res) => {
         const updated = await Order.findOneAndUpdate({orderId:razorpay_order_id},{paymentId:razorpay_payment_id,isPaymentDone:true},{new:true})
 
         // console.log(updated);
-        // console.log("payment is successful")
 
+        const coinData = await Coin.findById(updated.coinId,{name:true,description:true,material:true});
+        const userData = await User.findById(updated.userId,{name:true,email:true});
+
+        const text = `Dear ${userData.name},
+
+        We are delighted to inform you that we have received your payment for the auctioned coin. The coin will be delivered to you within the next few days. Please find below the details of your purchase:
+        
+        Coin Name: ${coinData.name}
+        Description: ${coinData.description}
+        Material: ${coinData.material}
+        Your Winning Bid: ${updated.amount}
+        Payment Id: ${updated.paymentId}
+        Delivery Address: address
+        
+        Thank you for your participation and congratulations on your winning bid! Should you have any questions or require further assistance, please do not hesitate to contact us.
+        
+        Best regards,
+        Coin Auction Website Team`;
+
+        const html = `<!DOCTYPE html>
+        <html>
+        <head>
+            <title>Payment Confirmation and Delivery Details</title>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    margin: 0;
+                    padding: 0;
+                    background-color: #f4f4f4;
+                }
+        
+                .container {
+                    max-width: 600px;
+                    margin: 0 auto;
+                    padding: 20px;
+                    background-color: #ffffff;
+                    border-radius: 5px;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                }
+        
+                h1 {
+                    color: #333333;
+                }
+        
+                p {
+                    color: #555555;
+                    margin-bottom: 10px;
+                }
+        
+                ul {
+                    list-style-type: none;
+                    padding: 0;
+                }
+        
+                li {
+                    margin-bottom: 5px;
+                }
+        
+                .footer {
+                    margin-top: 20px;
+                    text-align: center;
+                    color: #999999;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>Payment Confirmation and Delivery Details</h1>
+                <p>Dear ${userData.name},</p>
+                <p>We are delighted to inform you that we have received your payment for the auctioned coin. The coin will be delivered to you within the next few days. Please find below the details of your purchase:</p>
+                <ul>
+                    <li><strong>Name:</strong> ${coinData.name}</li>
+                    <li><strong>Description:</strong> ${coinData.description}</li>
+                    <li><strong>Material:</strong> ${coinData.material}</li>
+                    <li><strong>Your Winning Bid:</strong> ${updated.amount}</li>
+                    <li><strong>Payment Id:</strong> ${updated.paymentId}</li>
+                    <li><strong>Delivery Address:</strong> address</li>
+                </ul>
+                <p>Thank you for your participation and congratulations on your winning bid! Should you have any questions or require further assistance, please do not hesitate to contact us.</p>
+                <p class="footer">Best regards,<br/>Coin Auction Website Team</p>
+            </div>
+        </body>
+        </html>
+        `;
+
+        sendMail(userData.email,' Payment Confirmation and Delivery Details',text,html);
+        
         res.redirect(`http://localhost:3000/paymentsuccess?referenceId=${razorpay_payment_id}`)
     }
     else{

@@ -89,7 +89,7 @@ const AddNewCoin = () => {
       <h1>Add New Coin</h1>
       <form onSubmit={handleSubmit}>
         <FormLabel>
-          Name:
+          Coin Name:
           <FormInput type="text" name="name" value={coinData.name} onChange={handleChange} />
         </FormLabel>
         <FormLabel>

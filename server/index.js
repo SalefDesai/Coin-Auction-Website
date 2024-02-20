@@ -11,6 +11,7 @@ import payment from './routes/payment.js'
 import { auctionSocketio } from './socket/auctionSocket.js';
 import errorHandlerMiddleware from './middlewares/errorHandlerMiddleware.js';
 import Razorpay from 'razorpay';
+import cron from 'node-cron';
 
 dotenv.config();
 
@@ -57,6 +58,13 @@ mongoose.connect(process.env.MONGO_URI)
 
 
 auctionSocketio(io);
+
+// cron.schedule('* * * * *',() => {
+//   console.log("running/...................")
+// }, {
+//   scheduled: true,
+//   timezone: "Asia/Kolkata"
+// })
 
 
 app.use(errorHandlerMiddleware);

@@ -20,7 +20,7 @@ const RemainingPayments = () => {
     const fetchData = async() => {
       try {
         setLoading(true); 
-        const response = await axios.post(`${getRemainingPayment}`, { userId: user.userId });
+        const response = await axios.post(`${getRemainingPayment}`, { userId: user.userId },{withCredentials:true});
         setOrders(response.data.data);
         console.log(response.data.data);
       } catch (error) {
@@ -69,10 +69,10 @@ const OrderCard = ({ order, user }) => {
       coinId,
       userId : user.userId,
       orderId
-    })
+    },{withCredentials:true})
 
     try {
-      const {data:{key}} = await axios.get(`${getkey}`);
+      const {data:{key}} = await axios.get(`${getkey}`,{withCredentials:true});
 
       const options = {
         key, // Enter the Key ID generated from the Dashboard

@@ -62,6 +62,14 @@ const coinSchema = new mongoose.Schema({
     ],
     validate: [(arr) => arr.length <= 10, '{PATH} exceeds the limit of 10'],
   },
+  participants:[String
+      // {
+      //   participant: {
+      //     type : mongoose.Schema.Types.ObjectId,
+      //     ref:'users',
+      //   }
+      // }
+      ],
 });
 
 const Coin = mongoose.model('Coin', coinSchema);

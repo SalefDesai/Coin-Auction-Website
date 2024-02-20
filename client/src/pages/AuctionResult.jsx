@@ -40,7 +40,7 @@ const AuctionResult = () => {
   const handleProceed = async() => {
 
     try {
-      const {data:{key}} = await axios.get(`${getkey}`);
+      const {data:{key}} = await axios.get(`${getkey}`,{withCredentials:true});
 
       const options = {
         key, // Enter the Key ID generated from the Dashboard

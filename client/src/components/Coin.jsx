@@ -3,8 +3,8 @@ import styled from 'styled-components';
 import Timer from './Timer';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { checkIsAuthenticated } from '../utils/Routes';
-import { showErrorToast } from '../utils/Toast';
+import { auctionParticipation, checkIsAuthenticated } from '../utils/Routes';
+import { showErrorToast, showSuccessToast } from '../utils/Toast';
 import Modal from './Modal';
 
 
@@ -43,10 +43,39 @@ const Coin = ({ id, image, name, description, startTime, duration, material, sta
             })
       } else {
         showErrorToast("Need to Sign In to enter auction.");
+        navigate('/login');
       }
     } catch (error) {
       console.log(error);
     }
+  }
+
+  const participateInAuction = async() => {
+    console.log("clicked");
+
+    const userData = await JSON.parse(localStorage.getItem('coin-auction'));
+
+    if (!userData) {
+      showErrorToast("Need to Sign In to participate for auction.");
+      navigate('/login')
+      return
+    } 
+    
+    try {
+      const {data} = await axios.post(`${auctionParticipation}`,{
+        userName : userData.name,
+        userEmail : userData.email,
+        userId : userData.userId,
+        coinId : id
+      }, {withCredentials : true})
+  
+      if (data.success) {
+        showSuccessToast(data.message);
+      }
+    } catch (error) {
+      console.log("error : " , error);
+    }
+
   }
 
   const openModal = () => {setModalOpen(true);}
@@ -90,7 +119,7 @@ const Coin = ({ id, image, name, description, startTime, duration, material, sta
 
         <StyledButton>
           {buttonColor === 'blue' ? 
-          (<button type="button" className={`btn btn-primary btn-block ${buttonColor}`}>
+          (<button type="button" className={`btn btn-primary btn-block ${buttonColor}`} onClick={participateInAuction}>
             Participate
           </button>) : 
           (<button type="button" className={`btn btn-success btn-block ${buttonColor}`} onClick={joinAuction}>

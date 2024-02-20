@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { showErrorToast } from '../utils/Toast';
+import { showErrorToast, showSuccessToast } from '../utils/Toast';
 import axios from 'axios';
 import {getUserProfile, updateUserProfile} from '../utils/Routes.js'
 
@@ -50,10 +50,11 @@ const UpdateUserProfile = ({user}) => {
     e.preventDefault();
 
     try {
-      const response = await axios.post(`${updateUserProfile}`,{...formData})
+      const response = await axios.post(`${updateUserProfile}`,{...formData},{withCredentials:true})
 
       if (!response.data.success) showErrorToast(response.data.message);
       else {
+        showSuccessToast("User updated successfully.")
         setFormData({
           name: '',
           email: '',
@@ -79,7 +80,7 @@ const UpdateUserProfile = ({user}) => {
         <Input type="text" id="name" name="name" value={formData.name} onChange={handleChange} required />
 
         <Label htmlFor="email">Email:</Label>
-        <Input type="email" id="email" name="email" autoComplete='new-password' value={formData.email} onChange={handleChange} required />
+        <Input type="email" id="email" name="email" autoComplete='new-password' value={formData.email} onChange={handleChange} readOnly />
 
         <Label htmlFor="phoneNumber">Phone Number:</Label>
         <PhoneNumber type="tel" id="phoneNumber" name="phone" value={formData.phone} onChange={handleChange} />

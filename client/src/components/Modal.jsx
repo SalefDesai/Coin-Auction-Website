@@ -9,7 +9,9 @@ const Modal = ({ isOpen, onClose, image, name, description, startTime, duration,
         <ModalOverlay>
           <ModalContent>
             <CloseButton onClick={onClose}>&times;</CloseButton>
-            <img src={image} alt={name} />
+            <ImageWrapper>
+              <img src={image} alt={name} />
+            </ImageWrapper>
             <h2>{name}</h2>
             <p>{description}</p>
             <p>Start Time of Auction : {startTime}</p>
@@ -55,6 +57,16 @@ const CloseButton = styled.button`
   cursor: pointer;
   background: none;
   border: none;
+`;
+
+const ImageWrapper = styled.div`
+  margin-bottom: 20px;
+  img {
+    width: 100%;
+    height: 300px; /* Adjust height as needed */
+    object-fit: cover;
+    border-radius: 8px;
+  }
 `;
 
 export default Modal;
