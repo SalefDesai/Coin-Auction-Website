@@ -17,6 +17,10 @@ export const paymentVerification = `${host}/api/payment/paymentverification`
 export const getkey = `${host}/api/payment/getkey`
 
 
+export const URLForPuttingObjInS3 = `${host}/userauth/urlforputtingobjinS3`
+export const URLForGettingObjFromS3= `${host}/userauth/urlforgettingobjfroms3`
+
+
 
 
 // socket.io nameSpace

@@ -5,6 +5,20 @@ import Order from "../models/order.js";
 import Coin from "../models/coin.js";
 import { sendMail } from "../utils/sendMail.js";
 import nodemailer from 'nodemailer';
+import dotenv from 'dotenv'
+import { S3Client, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+
+
+dotenv.config();
+
+const s3Client = new S3Client({
+    region: "ap-south-1",
+    credentials: {
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    },
+  });
 
 
 export const signup = async (req,res) => {
@@ -37,7 +51,7 @@ export const signup = async (req,res) => {
             email,
             password : hashedPassword,
             phone,
-            userProfileImage,
+            userProfileImage:"",
             gender,
             userType
         });
@@ -382,4 +396,44 @@ export const participateInAuction = async(req,res) => {
         });
     }
 
+}
+
+
+export const getS3URLforPuttionObj = async(req,res) => {
+
+    try {
+        const { userId } = req.body;
+
+
+        const command = new PutObjectCommand({
+            Bucket: "aws-s3-image-storing",
+            Key: `userProfileImages/${userId}.jpg`,
+            ContentType:'image/jpeg'
+        })
+    
+        const url = await getSignedUrl(s3Client,command);
+
+        res.json({success : true, url})
+        
+    } catch (error) {
+        console.error("error is : ", error)
+        res.status(500).json({ success: false, message: 'Error generating URL', error: error.message });
+    }
+}
+
+
+export const getS3URLforGettingObj = async(req,res) => {
+    try {
+        const { userId } = req.body;
+        
+        const command = new GetObjectCommand({
+            Bucket: "aws-s3-image-storing",
+            Key: `userProfileImages/${userId}.jpg`,
+          });
+          
+          const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 }); // Optional: Set expiration time
+          res.json({success : true, url})
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Error generating URL', error: error.message });
+    }
 }

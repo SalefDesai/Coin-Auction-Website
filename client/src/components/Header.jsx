@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import axios from 'axios';
-import { getUserProfile, logout } from '../utils/Routes.js';
+import { URLForGettingObjFromS3, getUserProfile, logout } from '../utils/Routes.js';
 import { showErrorToast } from '../utils/Toast.js';
 
 
@@ -14,38 +14,54 @@ const Header = () => {
     const [user,setUser] = useState(null);    
     const [showSellerPage, setShowSellerPage] = useState(false);
     const [showAdminPage, setShowAdminPage] = useState(false);
+    const [userProfileImage, setUserProfileImage] = useState(null);
 
-    useEffect(() => {
-      const getUserInfo = async () => {
-        try {
-          const response = await axios.get(`${getUserProfile}`,{withCredentials:true});
+  useEffect(() => {
+    const getUserInfo = async () => {
+      try {
+        const response = await axios.get(getUserProfile, { withCredentials: true });
 
-          if (response.data.success) {
-            setUser(response.data.user);
-            setIsLogin(true);
+        if (response.data.success) {
+          setUser(response.data.user);
+          setIsLogin(true);
 
-            if (response.data.user.email === 'admin@gmail.com' && response.data.user.userType === 'admin'){
-              setShowAdminPage(true);
-            }
-            if (response.data.user.userType === 'seller'){
-              setShowSellerPage(true);
-            }
-            
-          } else {
-            setIsLogin(false);
-            localStorage.removeItem("coin-auction");
-            setUser({});
-            setShowAdminPage(false);
-            setShowSellerPage(false);
+          if (response.data.user.email === 'admin@gmail.com' && response.data.user.userType === 'admin') {
+            setShowAdminPage(true);
           }
-        } catch (error) {
-          console.log("error : ", error);
-        } 
+          if (response.data.user.userType === 'seller') {
+            setShowSellerPage(true);
+          }
+        } else {
+          setIsLogin(false);
+          localStorage.removeItem("coin-auction");
+          setUser({});
+          setShowAdminPage(false);
+          setShowSellerPage(false);
+        }
+      } catch (error) {
+        console.log("error : ", error);
       }
+    };
 
-      getUserInfo();
+    getUserInfo();
+  }, []);
 
-    }, []);
+  useEffect(() => {
+    const getUserProfileImageFromS3 = async () => {
+      if (user && user.userId) {
+        try {
+          const getURL = await axios.post(URLForGettingObjFromS3, { userId: user.userId }, { withCredentials: true });
+          setUserProfileImage(getURL.data.url);
+        } catch (error) {
+          console.log("Error fetching user profile image:", error);
+        }
+      }
+    };
+
+    if (isLogin) {
+      getUserProfileImageFromS3();
+    }
+  }, [isLogin, user]);
 
     const handleClick = async() => {
       
@@ -89,8 +105,8 @@ const Header = () => {
 
           <div className="dropdown text-end" style={{ cursor: 'pointer' }}>
             <div className="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-              {isLogin && user.userProfileImage !== "" ? (
-                <img src={user.userProfileImage} alt="mdo" width="32" height="32" className="rounded-circle"/>
+              {isLogin && userProfileImage !== null? (
+                <img src={userProfileImage} alt="mdo" width="32" height="32" className="rounded-circle"/>
               ) : (
                 <img src="https://th.bing.com/th/id/OIP.ruat7whad9-kcI8_1KH_tQHaGI?w=263&h=218&c=7&r=0&o=5&dpr=1.3&pid=1.7" alt="mdo" width="32" height="32" className="rounded-circle"/>
               )}

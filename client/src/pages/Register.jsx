@@ -3,9 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { showErrorToast } from '../utils/Toast';
 import axios from 'axios';
-import {signUpRoute} from '../utils/Routes.js'
-// import {signInRoute, signUpRoute} from '../utils/APIRoutes.js';
-
+import { URLForPuttingObjInS3, signUpRoute } from '../utils/Routes.js';
 
 const RegistrationContainer = styled.div`
   display: flex;
@@ -15,7 +13,7 @@ const RegistrationContainer = styled.div`
 `;
 
 const Logo = styled.img`
-  width: 100px; /* Adjust as needed */
+  width: 100px;
   height: auto;
   margin-bottom: 20px;
 `;
@@ -86,8 +84,7 @@ const AlreadyHaveAccount = styled.p`
   }
 `;
 
-const PhoneNumber = styled(Input)` /* You can customize the style further if needed */`;
-
+const PhoneNumber = styled(Input)` /* You can customize the style further if needed */ `;
 
 const RegistrationPage = () => {
   const navigate = useNavigate();
@@ -97,56 +94,64 @@ const RegistrationPage = () => {
     password: '',
     confirmPassword: '',
     phone: '',
-    userProfileImage: '',
     gender: '',
-    userType: 'user'    
+    userType: 'user'
   });
+
+  const [profileImage, setProfileImage] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
 
-  const convertToBase64 = (event) => {
-    const {name} = event.target;
+  const handleFileChange = (event) => {
     const file = event.target.files[0];
-
     if (file && file.size > 5 * 1024 * 1024) {
       showErrorToast("File should be less than 5 MB.");
       return;
     }
+    setProfileImage(file);
+  };
 
-    var reader = new FileReader();
-    if (file) reader.readAsDataURL(file);
-
-    reader.onload = () => {
-      setFormData((prevData) => ({ ...prevData, [name]: reader.result }));
-    };
-    reader.onerror = error => {
-      console.log("Error : ", error);
-    }
-}
-
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (formData.password.length < 8 ) showErrorToast("Password shoud atlest have 8 characters");
-    else if (formData.password !== formData.confirmPassword) {
-      showErrorToast("Password and confirm Password should be same");
+    if (formData.password.length < 8) {
+      showErrorToast("Password should be at least 8 characters");
+      return;
+    } else if (formData.password !== formData.confirmPassword) {
+      showErrorToast("Password and confirm Password should be the same");
       setFormData((prevData) => ({
         ...prevData,
-        confirmPassword:''
-      }))
-    } else if (formData.name.length < 3) showErrorToast("User name should have more than 3 character.");
-
+        confirmPassword: ''
+      }));
+      return;
+    } else if (formData.name.length < 3) {
+      showErrorToast("User name should have more than 3 characters.");
+      return;
+    }
 
     try {
-      const response = await axios.post(`${signUpRoute}`,{...formData},{withCredentials:true})
+      const response = await axios.post(signUpRoute, { ...formData }, { withCredentials: true });
+      if (!response.data.success) {
+        showErrorToast(response.data.message);
+      } else {
+        const userId = response.data.user.userId;
 
-      if (!response.data.success) showErrorToast(response.data.message);
-      else {
+        if (profileImage) {
+          const urlResponse = await axios.post(URLForPuttingObjInS3, { userId }, { withCredentials: true });
+          const uploadUrl = urlResponse.data.url;
+
+          await axios.put(uploadUrl, profileImage, {
+            headers: {
+              'Content-Type': profileImage.type
+            }
+          });
+        }
+
         navigate("/");
-        localStorage.setItem("coin-auction",JSON.stringify(response.data.user));
+        localStorage.setItem("coin-auction", JSON.stringify(response.data.user));
       }
 
     } catch (error) {
@@ -184,9 +189,8 @@ const RegistrationPage = () => {
         <Label htmlFor="phoneNumber">Phone Number:</Label>
         <PhoneNumber type="tel" id="phoneNumber" name="phone" value={formData.phone} onChange={handleChange} />
 
-
         <Label htmlFor='userProfileImage'>Profile Image</Label>
-        <Input type="file" name='userProfileImage' placeholder="Upload your profile image" accept='image/*' onChange={convertToBase64} />
+        <Input type="file" name='userProfileImage' placeholder="Upload your profile image" accept='image/*' onChange={handleFileChange} />
 
         <GenderContainer>
           <Label>Gender:</Label>

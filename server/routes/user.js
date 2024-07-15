@@ -1,5 +1,5 @@
 import express from 'express';
-import { checkAuth, getProfile, getRemainingPayment, getUsersCoin, makeOffer, participateInAuction, signIn, signup, updateUserProfile } from '../controllers/useAuth.js';
+import { checkAuth, getProfile, getRemainingPayment, getS3URLforGettingObj, getS3URLforPuttionObj, getUsersCoin, makeOffer, participateInAuction, signIn, signup, updateUserProfile } from '../controllers/useAuth.js';
 import { isAuthenitcated } from '../middlewares/auth.js';
 import { logout } from '../utils/features.js';
 
@@ -28,6 +28,9 @@ router.post("/makeOffer",isAuthenitcated,makeOffer)
 
 router.post("/participateinauction",isAuthenitcated,participateInAuction)
 
+router.post("/urlforputtingobjinS3",getS3URLforPuttionObj);
+
+router.post("/urlforgettingobjfroms3",getS3URLforGettingObj);
 
 
 
