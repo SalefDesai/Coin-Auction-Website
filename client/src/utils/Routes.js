@@ -1,4 +1,4 @@
-export const host = "http://localhost:5000";
+export const host = `${process.env.REACT_APP_HOST_URI}`;
 
 
 export const signInRoute = `${host}/userauth/signin`;
